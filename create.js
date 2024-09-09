@@ -7,22 +7,16 @@ const { HDKey } = require('ethereum-cryptography/hdkey');
 const tonweb = new TonWeb();
 
 function generateSeedPhrase() {
-    return bip39.generateMnemonic(256); // 256 bits generate 24 words
+    return bip39.generateMnemonic(256); // 256 bits for 24 words
 }
 
 function generateKeyPairFromSeed(seedPhrase) {
     const seed = bip39.mnemonicToSeedSync(seedPhrase);
     const hdKey = HDKey.fromMasterSeed(seed);
-    const keyPair = {
+    return {
         publicKey: hdKey.publicKey.toString('hex'),
         privateKey: hdKey.privateKey.toString('hex')
     };
-    return keyPair;
-}
-
-function generateWallet(keyPair) {
-    const wallet = new TonWeb.Wallet(keyPair);
-    return wallet;
 }
 
 async function createWallets(numWallets) {
@@ -31,14 +25,11 @@ async function createWallets(numWallets) {
     for (let i = 0; i < numWallets; i++) {
         const seedPhrase = generateSeedPhrase();
         const keyPair = generateKeyPairFromSeed(seedPhrase);
-        const wallet = generateWallet(keyPair);
-        const publicKey = keyPair.publicKey;
-        const privateKey = keyPair.privateKey;
         
         wallets.push({
             seedPhrase,
-            publicKey,
-            privateKey
+            publicKey: keyPair.publicKey,
+            privateKey: keyPair.privateKey
         });
     }
     
